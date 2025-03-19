@@ -96,41 +96,171 @@ BUDGET_ALLOCATION = {
 }
 
 # DuPont Tedlar product and ICP information
-# This context is crucial for generating relevant leads
+# Enhanced with detailed Perplexity research
 TEDLAR_CONTEXT = {
     "product_name": "DuPont Tedlar protective films",
-    "product_description": "High-performance protective films that provide exceptional durability, UV protection, and weather resistance for graphics, signage, and architectural applications.",
+    "product_description": "Premium polyvinyl fluoride (PVF) protective films with over 60 years of technology development, specifically engineered to extend the life of graphics applications in challenging environments.",
+    "product_specifications": {
+        "composition": "Proprietary polyvinyl fluoride (PVF) technology",
+        "thicknesses": "1.0 mil (25μm) to 2.0 mil (50μm)",
+        "standard_widths": "48\" to 60\" (custom widths available)",
+        "surface_finishes": ["Clear", "Matte", "Custom textures"],
+        "temperature_range": "-70°F to 302°F (-57°C to 150°C)",
+        "uv_protection": "Blocks >99% of damaging UV radiation"
+    },
+    "product_lines": [
+        {"name": "Tedlar CLR", "description": "Clear protective overlaminates for maximum color clarity"},
+        {"name": "Tedlar TWH", "description": "White films for backlit signage applications"},
+        {"name": "Tedlar TMT", "description": "Matte finish films for glare reduction"},
+        {"name": "Tedlar TCW", "description": "Customizable width films for large format applications"},
+        {"name": "Tedlar TAW", "description": "Architectural grade films for building graphics"}
+    ],
     "key_benefits": [
-        "Superior protection against UV degradation",
-        "Excellent chemical resistance",
-        "Extended graphic and color life",
-        "Protection against environmental damage",
-        "Enhanced durability in outdoor applications"
+        "Extended graphic life (5-7 years longer than standard laminates)",
+        "Superior color retention (<3 Delta E color shift after 10 years)",
+        "Exceptional chemical resistance (resistant to 300+ chemicals)",
+        "Graffiti resistance with easy cleaning",
+        "Anti-delamination technology preventing edge lifting",
+        "Weather resistance tested for 10+ years outdoor exposure",
+        "Reduced maintenance and cleaning frequency"
     ],
-    "target_industries": [
-        "Graphics & Signage", 
-        "Large format printing",
-        "Architectural graphics",
-        "Vehicle wraps",
-        "Outdoor advertising"
+    "target_customer_segments": [
+        {
+            "segment": "Large Format Print Providers",
+            "size_revenue": "$5M-$50M annual revenue",
+            "size_employees": "50-250 employees",
+            "geographic_scope": "National or multinational operations",
+            "pain_points": ["Premature graphic failure", "Warranty claims", "Color fading"],
+            "decision_makers": ["Operations Directors", "Production Managers", "R&D Directors"]
+        },
+        {
+            "segment": "Fleet Graphics Specialists",
+            "size_revenue": "$2M-$20M annual revenue",
+            "size_employees": "25-100 employees",
+            "pain_points": ["Graphics degradation in harsh transit conditions", "Fleet downtime"],
+            "decision_makers": ["Fleet Graphics Directors", "Product Development Managers"]
+        },
+        {
+            "segment": "Architectural Graphics Manufacturers",
+            "size_revenue": "$10M-$100M annual revenue",
+            "size_employees": "100-500 employees",
+            "pain_points": ["Extended warranties", "Installation complexity", "Material longevity"],
+            "decision_makers": ["VP of Product Development", "Materials Engineering Directors"]
+        },
+        {
+            "segment": "Outdoor Advertising Companies",
+            "size_revenue": "$20M-$500M annual revenue",
+            "size_employees": "100-1,000 employees",
+            "pain_points": ["Weather damage", "Maintenance costs", "Extended installation lifespans"],
+            "decision_makers": ["Production Directors", "Materials Procurement Managers"]
+        },
+        {
+            "segment": "Sign Manufacturing Companies",
+            "size_revenue": "$1M-$25M annual revenue",
+            "size_employees": "20-150 employees",
+            "pain_points": ["UV degradation", "Color consistency", "Delamination"],
+            "decision_makers": ["Production Managers", "Technical Directors"]
+        },
+        {
+            "segment": "Material Distributors & Converters",
+            "size_revenue": "$10M-$200M annual revenue",
+            "size_employees": "50-300 employees",
+            "pain_points": ["Product differentiation", "Competitive advantages", "Specialized applications"],
+            "decision_makers": ["Product Line Managers", "Business Development Directors"]
+        }
     ],
-    "ideal_customer_profile": {
-        "company_types": [
-            "Graphics manufacturers",
-            "Signage producers",
-            "Printing companies",
-            "Architectural film suppliers",
-            "Graphics media suppliers"
+    "use_cases": [
+        {
+            "category": "Transit & Fleet Graphics",
+            "applications": [
+                "Bus wraps requiring 5-7 year durability",
+                "Fleet vehicle graphics with reduced replacement cycles",
+                "Rail car exterior graphics exposed to extreme conditions"
+            ]
+        },
+        {
+            "category": "Architectural Applications",
+            "applications": [
+                "Building facade graphics with 10+ year warranties",
+                "Interior wayfinding with chemical cleaning resistance",
+                "Corporate identity signage with consistent appearance"
+            ]
+        },
+        {
+            "category": "Outdoor Signage",
+            "applications": [
+                "Highway billboards with minimal maintenance",
+                "Stadium and arena signage with weather resistance",
+                "Retail exterior signage with enhanced color retention"
+            ]
+        },
+        {
+            "category": "Specialty Applications",
+            "applications": [
+                "Marine graphics with salt water resistance",
+                "Airport signage with jet fuel vapor resistance",
+                "Industrial signage in chemical processing environments"
+            ]
+        }
+    ],
+    "competitive_positioning": {
+        "primary_competitors": ["3M Scotchcal", "Avery Dennison MPI", "ORAFOL Oraguard"],
+        "performance_advantages": [
+            "30-50% longer life in accelerated weathering tests",
+            "Superior UV resistance with proprietary inhibitors",
+            "Chemical resistance to 300+ substances",
+            "Less than 0.2% shrinkage compared to 0.5-1.5% for competitors"
         ],
-        "company_size": "Mid to large enterprises with significant production volume",
-        "pain_points": [
-            "Premature graphic fading in outdoor applications", 
-            "Chemical damage to graphics in harsh environments",
-            "Need for extended durability of printed materials",
-            "Warranty claims due to product failure"
-        ],
-        "example_customer": "Avery Dennison Graphics Solutions"
-    }
+        "pricing": "Premium positioned at 15-30% above standard protective films",
+        "total_cost_of_ownership": "Despite 15-20% premium pricing, delivers 30-40% lower lifetime costs"
+    },
+    "key_industry_events_2024": [
+        {
+            "name": "ISA International Sign Expo 2024",
+            "date": "April 10-12, 2024",
+            "location": "Orlando, FL",
+            "attendees": "20,000+ professionals",
+            "relevance": "Premier event for sign, graphics, and visual communications industry"
+        },
+        {
+            "name": "PRINTING United Expo 2024",
+            "date": "September 10-12, 2024",
+            "location": "Las Vegas, NV",
+            "attendees": "18,000+ professionals",
+            "relevance": "Comprehensive printing industry event spanning all markets and technologies"
+        },
+        {
+            "name": "FESPA Global Print Expo 2024",
+            "date": "May 21-24, 2024",
+            "location": "Amsterdam, Netherlands",
+            "attendees": "15,000+ international visitors",
+            "relevance": "International exhibition for screen, digital, and textile printing"
+        },
+        {
+            "name": "Graphics Pro Expo 2024",
+            "date": "Various (6 regional events throughout 2024)",
+            "location": "Multiple US cities",
+            "attendees": "2,000-3,500 per regional event",
+            "relevance": "Regional focus with education and product showcase for graphics professionals"
+        }
+    ],
+    "key_industry_associations": [
+        {
+            "name": "International Sign Association (ISA)",
+            "members": "2,300+ sign and graphics companies",
+            "relevance": "Primary trade association for sign industry professionals"
+        },
+        {
+            "name": "PRINTING United Alliance",
+            "members": "7,000+ companies across printing technologies",
+            "relevance": "Created from merger of SGIA and PIA, representing broad printing industry"
+        },
+        {
+            "name": "Society for Experiential Graphic Design (SEGD)",
+            "members": "2,000+ professionals across multiple disciplines",
+            "relevance": "Focus on architectural, wayfinding, and experiential graphics"
+        }
+    ]
 }
 
 # Lead scoring system
