@@ -283,26 +283,21 @@ def prioritize_gatherings(gatherings: List[Dict[str, Any]]) -> List[Dict[str, An
     return prioritized_gatherings
 
 def save_gathering_data(gatherings: List[Dict[str, Any]]):
-    """
-    Save event and association data to JSON files.
-    
-    Structured data storage is essential for the downstream company analysis module,
-    ensuring data integrity and consistency throughout the lead generation pipeline.
-    
-    Args:
-        gatherings: List of analyzed and prioritized events and associations
-    """
+    """Save event and association data to JSON files."""
     events_dir = DATA_DIR / "events"
     events_dir.mkdir(exist_ok=True)
     
     associations_dir = DATA_DIR / "associations"
     associations_dir.mkdir(exist_ok=True)
     
-    # Function to make data JSON serializable
-    def make_serializable(obj):
-        if isinstance(obj, uuid.UUID):
-            return str(obj)
-        return obj
+    # Custom JSON encoder to handle UUIDs and datetimes
+    class CustomEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, uuid.UUID):
+                return str(obj)
+            if isinstance(obj, datetime):
+                return obj.isoformat()
+            return super().default(obj)
     
     # Save each gathering as a separate JSON file
     for gathering in gatherings:
@@ -325,12 +320,8 @@ def save_gathering_data(gatherings: List[Dict[str, Any]]):
                 source=gathering.get("source", "")
             )
             
-            # Convert to dictionary and fix UUID issue
-            gathering_dict = gathering_obj.model_dump()  # Use model_dump instead of dict
-            
-            # Convert UUID to string
-            if isinstance(gathering_dict["id"], uuid.UUID):
-                gathering_dict["id"] = str(gathering_dict["id"])
+            # Convert to dictionary
+            gathering_dict = gathering_obj.model_dump()  # Using model_dump as recommended
             
             # Add additional fields
             gathering_dict["type"] = gathering.get("type", "event")
@@ -348,7 +339,7 @@ def save_gathering_data(gatherings: List[Dict[str, Any]]):
                 file_path = events_dir / f"{str(gathering_dict['id'])}.json"
                 
             with open(file_path, "w") as f:
-                json.dump(gathering_dict, f, indent=2)
+                json.dump(gathering_dict, f, indent=2, cls=CustomEncoder)
                 
             print(f"Saved {gathering['type']} data for: {gathering['name']}")
         except Exception as e:

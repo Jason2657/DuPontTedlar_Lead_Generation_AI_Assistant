@@ -10,6 +10,7 @@ lead generation pipeline, optimized for:
 """
 
 from config.config import TEDLAR_CONTEXT, LEAD_SCORING
+import json
 
 # Base context for all prompts - reduces redundant information in each prompt
 BASE_TEDLAR_CONTEXT = f"""
@@ -357,4 +358,15 @@ def customize_prompt(prompt_template: str, **kwargs) -> str:
     This function allows efficient reuse of prompt templates while
     inserting context-specific information.
     """
-    return prompt_template.format(**kwargs)
+    # Add any missing keys that might be in the template
+    if "'criteria'" in prompt_template or "{criteria}" in prompt_template:
+        kwargs["criteria"] = json.dumps(LEAD_SCORING, indent=2)
+    
+    try:
+        return prompt_template.format(**kwargs)
+    except KeyError as e:
+        print(f"Warning: Missing key in prompt template: {e}")
+        # Add the missing key with a placeholder value
+        key = str(e).strip("'")
+        kwargs[key] = f"<{key} not provided>"
+        return prompt_template.format(**kwargs)
