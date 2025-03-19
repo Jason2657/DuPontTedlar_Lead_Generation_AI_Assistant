@@ -14,14 +14,14 @@ import requests
 from typing import Dict, Any, List, Optional
 import openai
 from datetime import datetime
-from config.config import OPENAI_API_KEY, PERPLEXITY_API_KEY, TOKEN_PRICING
+from config.config import OPENAI_API_KEY, PERPLEXITY_API_KEY, TOKEN_PRICING, DATA_DIR
 from pathlib import Path
 
 # Initialize API clients
 openai.api_key = OPENAI_API_KEY
 
 # Path for token usage logging
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+#from config.config import DATA_DIR
 TOKEN_USAGE_FILE = DATA_DIR / "token_usage.json"
 
 def log_token_usage(
@@ -89,28 +89,35 @@ def call_openai_api(
 ) -> Dict[str, Any]:
     """
     Call OpenAI API with error handling and token tracking.
-    
-    This function implements automatic retries and detailed cost tracking
-    to optimize our budget usage across the lead generation pipeline.
+    Updated to use OpenAI API v1.0.0+
     """
     max_retries = 3
     retry_delay = 2
     
+    client = openai.OpenAI(api_key=OPENAI_API_KEY)
+    
     for attempt in range(max_retries):
         try:
-            # Make API call
-            response = openai.ChatCompletion.create(
+            # Make API call using new format
+            response = client.chat.completions.create(
                 model=model,
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens
             )
             
+            # Process usage for token tracking
+            usage_data = {
+                "prompt_tokens": response.usage.prompt_tokens,
+                "completion_tokens": response.usage.completion_tokens,
+                "total_tokens": response.usage.total_tokens
+            }
+            
             # Log token usage
             usage = log_token_usage(
                 model=model,
-                prompt_tokens=response.usage.prompt_tokens,
-                completion_tokens=response.usage.completion_tokens,
+                prompt_tokens=usage_data["prompt_tokens"],
+                completion_tokens=usage_data["completion_tokens"],
                 module=module,
                 operation=operation
             )

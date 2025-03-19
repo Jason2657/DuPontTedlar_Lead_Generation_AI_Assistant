@@ -295,9 +295,14 @@ def save_gathering_data(gatherings: List[Dict[str, Any]]):
     events_dir = DATA_DIR / "events"
     events_dir.mkdir(exist_ok=True)
     
-    # Create a separate directory for associations
     associations_dir = DATA_DIR / "associations"
     associations_dir.mkdir(exist_ok=True)
+    
+    # Function to make data JSON serializable
+    def make_serializable(obj):
+        if isinstance(obj, uuid.UUID):
+            return str(obj)
+        return obj
     
     # Save each gathering as a separate JSON file
     for gathering in gatherings:
@@ -307,7 +312,6 @@ def save_gathering_data(gatherings: List[Dict[str, Any]]):
         
         try:
             # Create Event object for validation
-            # (We'll use the Event model for both events and associations)
             gathering_obj = Event(
                 id=gathering["id"],
                 name=gathering["name"],
@@ -321,8 +325,12 @@ def save_gathering_data(gatherings: List[Dict[str, Any]]):
                 source=gathering.get("source", "")
             )
             
-            # Convert to dictionary for saving
-            gathering_dict = gathering_obj.dict()
+            # Convert to dictionary and fix UUID issue
+            gathering_dict = gathering_obj.model_dump()  # Use model_dump instead of dict
+            
+            # Convert UUID to string
+            if isinstance(gathering_dict["id"], uuid.UUID):
+                gathering_dict["id"] = str(gathering_dict["id"])
             
             # Add additional fields
             gathering_dict["type"] = gathering.get("type", "event")
@@ -335,9 +343,9 @@ def save_gathering_data(gatherings: List[Dict[str, Any]]):
                 
             # Save to appropriate directory based on type
             if gathering.get("type") == "association":
-                file_path = associations_dir / f"{gathering['id']}.json"
+                file_path = associations_dir / f"{str(gathering_dict['id'])}.json"
             else:
-                file_path = events_dir / f"{gathering['id']}.json"
+                file_path = events_dir / f"{str(gathering_dict['id'])}.json"
                 
             with open(file_path, "w") as f:
                 json.dump(gathering_dict, f, indent=2)
