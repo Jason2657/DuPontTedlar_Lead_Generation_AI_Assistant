@@ -259,6 +259,21 @@ TEDLAR_CONTEXT = {
             "name": "Society for Experiential Graphic Design (SEGD)",
             "members": "2,000+ professionals across multiple disciplines",
             "relevance": "Focus on architectural, wayfinding, and experiential graphics"
+        },
+        {
+            "name": "FESPA",
+            "members": "37 national associations and thousands of company members",
+            "relevance": "Global federation with strong European presence"
+        },
+        {
+            "name": "Specialty Graphic Imaging Association (SGIA)",
+            "members": "Now part of PRINTING United Alliance",
+            "relevance": "Historical focus on specialty graphics, including screen printing"
+        },
+        {
+            "name": "National Association of Sign Supply Distributors (NASSD)",
+            "members": "Leading distributors of sign supplies and materials",
+            "relevance": "Key channel partners for material distribution"
         }
     ]
 }

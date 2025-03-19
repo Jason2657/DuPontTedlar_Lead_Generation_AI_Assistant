@@ -58,6 +58,13 @@ COMPETITIVE POSITIONING:
 Despite being priced 15-30% higher than standard protective films, Tedlar delivers 30-40% lower lifetime costs
 through superior durability, outperforming competitors like 3M Scotchcal, Avery Dennison MPI, and ORAFOL Oraguard
 in accelerated weathering tests by 30-50%.
+
+KEY INDUSTRY ASSOCIATIONS:
+- International Sign Association (ISA): 2,300+ sign and graphics companies
+- PRINTING United Alliance: 7,000+ companies across printing technologies
+- FESPA: Global federation with strong European presence
+- Society for Experiential Graphic Design (SEGD): Focus on architectural and wayfinding graphics
+- National Association of Sign Supply Distributors (NASSD): Key distributors of sign materials
 """
 
 # EVENT RESEARCH PROMPTS
