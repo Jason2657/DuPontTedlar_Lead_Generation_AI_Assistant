@@ -36,18 +36,14 @@ def clipboard_button(text):
     )
 
 # Simple edit dialog
-def show_edit_dialog(message_text, subject, stakeholder_name):
-    """Show a simple dialog for editing messages"""
-    with st.expander("✏️ Edit & Send", expanded=False):
-        edited_subject = st.text_input("Subject:", value=subject)
-        edited_message = st.text_area("Message:", value=message_text, height=300)
-        
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            st.button("📝 Save Draft")
-        with col2:
-            if st.button("✉️ Send Message"):
-                st.success(f"✅ Message sent to {stakeholder_name}!")
+def show_edit_dialog(message_body, subject, stakeholder_name):
+    st.markdown("#### ✏️ Edit & Send")
+    st.markdown("##### Edit Outreach Details")
+    edited_subject = st.text_input("Subject", value=subject, key=f"subject_{subject}")
+    edited_body = st.text_area("Message Body", value=message_body, height=200, key=f"body_{subject}")
+    st.markdown(f"**Stakeholder:** {stakeholder_name}")
+    if st.button("Save Edits", key=f"save_{subject}"):
+        st.success("Edits saved (mock).")
 
 # Set page config for a cleaner look
 st.set_page_config(
@@ -614,12 +610,13 @@ def outreach_page():
                 st.markdown(message.get('call_to_action', 'No call to action specified'))
             
             with col2:
-                # Action buttons
                 st.markdown("#### Actions")
                 clipboard_button(message["message_body"])
-                show_edit_dialog(message["message_body"], message["subject"], message["stakeholder_name"])
+                # Use a checkbox to toggle showing the edit form
+                if st.checkbox("Show Edit & Send", key=f"edit_{message.get('id', uuid.uuid4())}"):
+                    show_edit_dialog(message["message_body"], message["subject"], message["stakeholder_name"])
                 st.button("✉️ Send Now", key=f"send_{message.get('id', uuid.uuid4())}", 
-                        on_click=lambda: st.success(f"✅ Message sent to {message['stakeholder_name']}!"))
+                          on_click=lambda: st.success(f"✅ Message sent to {message['stakeholder_name']}!"))
 
 # Main function
 def main():
