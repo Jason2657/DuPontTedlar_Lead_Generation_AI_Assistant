@@ -151,6 +151,22 @@ def discover_companies_for_gathering(gathering: Dict[str, Any]) -> List[Dict[str
     strong prospects for Tedlar's protective films.
 
     FORMAT YOUR RESPONSE AS JSON with an array of company objects.
+
+    IMPORTANT: Your response must be valid JSON containing ONLY an array of company objects.
+    You must return a valid JSON array only, with no additional text or explanation.
+    Keep your response format simple like this:
+    [
+        {{
+            "name": "Company Name",
+            "industry": "Graphics & Signage", 
+            "description": "Brief description",
+            "revenue_estimate": "$XXM",
+            "size_estimate": "XXX employees",
+            "why_relevant": "Short explanation",
+            "qualification_score": 8.5
+        }}
+    ]
+    Do not include any explanatory text, just the JSON array.
     """
     
     # Use cost-effective model for initial discovery
@@ -158,39 +174,102 @@ def discover_companies_for_gathering(gathering: Dict[str, Any]) -> List[Dict[str
     response = call_openai_api(
         messages=[{"role": "system", "content": prompt}],
         model=gpt35_config["model"],
-        temperature=gpt35_config["temperature"],
-        max_tokens=gpt35_config["max_tokens"],
+        temperature=0.1,  # Lower temperature for more consistent formatting
+        max_tokens=2000,  # Increase token limit to ensure complete responses
         module="company_analysis",
         operation="company_discovery"
     )
+
+    print(f"\nDEBUG - First 500 characters of API response:")
+    print(response["content"][:500])
+    print("\n")
     
     # Extract and parse the companies from the response
     try:
         content = response["content"]
         
-        # Find and extract JSON content
-        json_start = content.find('[')
-        json_end = content.rfind(']') + 1
-        
-        if json_start >= 0 and json_end > json_start:
-            json_content = content[json_start:json_end]
-            discovered_companies = json.loads(json_content)
-        else:
-            # Fallback if JSON format isn't clear
-            print(f"WARNING: Could not extract JSON from response for {gathering['name']}. Using fallback approach.")
+        # First, try standard JSON parsing for complete responses
+        try:
+            # Try parsing directly first
+            discovered_companies = json.loads(content)
+            # Check if it's already an array
+            if not isinstance(discovered_companies, list):
+                # If it's an object with a companies field, use that
+                if isinstance(discovered_companies, dict) and "companies" in discovered_companies:
+                    discovered_companies = discovered_companies["companies"]
+                # If it's just an object, wrap it in a list
+                else:
+                    discovered_companies = [discovered_companies]
+        except json.JSONDecodeError:
+            # If direct parsing fails, try to extract and fix incomplete JSON
+            print(f"Warning: Initial JSON parsing failed, attempting to repair JSON")
             
-            # Add example company as fallback for prototype
-            discovered_companies = [
-                {
-                    "name": "Avery Dennison Graphics Solutions",
-                    "industry": "Graphics & Signage",
-                    "description": "Global manufacturer of graphics materials and solutions",
-                    "revenue_estimate": "$8B+",
-                    "size_estimate": "Thousands of employees",
-                    "why_relevant": "Specializes in large-format signage, architectural graphics, and vehicle wraps.",
-                    "qualification_score": 8.5
-                }
-            ]
+            # Look for array pattern
+            import re
+            array_match = re.search(r'\[\s*\{.*', content, re.DOTALL)
+            
+            if array_match:
+                partial_json = array_match.group(0)
+                
+                # Try to identify company objects and parse them individually
+                company_objects = []
+                company_pattern = re.findall(r'\{\s*"name":.*?(?="name"|$)', partial_json, re.DOTALL)
+                
+                if company_pattern:
+                    for company_str in company_pattern:
+                        # Clean up and complete the JSON object if needed
+                        if not company_str.strip().endswith('}'):
+                            company_str += '}'
+                        try:
+                            company_obj = json.loads(company_str)
+                            company_objects.append(company_obj)
+                        except:
+                            pass
+                    
+                    if company_objects:
+                        discovered_companies = company_objects
+                    else:
+                        # Fallback to example company
+                        print(f"WARNING: Could not repair JSON. Using fallback approach.")
+                        discovered_companies = [
+                            {
+                                "name": "Avery Dennison Graphics Solutions",
+                                "industry": "Graphics & Signage",
+                                "description": "Global manufacturer of graphics materials and solutions",
+                                "revenue_estimate": "$8B+",
+                                "size_estimate": "Thousands of employees",
+                                "why_relevant": "Specializes in large-format signage, architectural graphics, and vehicle wraps.",
+                                "qualification_score": 8.5
+                            }
+                        ]
+                else:
+                    # No company patterns found, use fallback
+                    print(f"WARNING: Could not extract company patterns. Using fallback approach.")
+                    discovered_companies = [
+                        {
+                            "name": "Avery Dennison Graphics Solutions",
+                            "industry": "Graphics & Signage",
+                            "description": "Global manufacturer of graphics materials and solutions",
+                            "revenue_estimate": "$8B+",
+                            "size_estimate": "Thousands of employees",
+                            "why_relevant": "Specializes in large-format signage, architectural graphics, and vehicle wraps.",
+                            "qualification_score": 8.5
+                        }
+                    ]
+            else:
+                # No JSON array pattern found, use fallback
+                print(f"WARNING: No JSON array pattern found. Using fallback approach.")
+                discovered_companies = [
+                    {
+                        "name": "Avery Dennison Graphics Solutions",
+                        "industry": "Graphics & Signage",
+                        "description": "Global manufacturer of graphics materials and solutions",
+                        "revenue_estimate": "$8B+",
+                        "size_estimate": "Thousands of employees",
+                        "why_relevant": "Specializes in large-format signage, architectural graphics, and vehicle wraps.",
+                        "qualification_score": 8.5
+                    }
+                ]
     except Exception as e:
         print(f"Error parsing response for {gathering['name']}: {str(e)}")
         discovered_companies = []
@@ -431,6 +510,10 @@ def qualify_company(company: Dict[str, Any]) -> Dict[str, Any]:
     # Calculate overall qualification score using our weighted model
     if criterion_scores:
         overall_score = calculate_lead_score(criterion_scores)
+        # Ensure score is in the 0-10 range
+        if overall_score > 10:
+            print(f"WARNING: Normalizing abnormal score {overall_score} to 10.0")
+            overall_score = 10.0
         qualified_company["qualification_score"] = overall_score
         qualified_company["lead_priority"] = get_lead_priority(overall_score)
     
@@ -613,6 +696,18 @@ def save_company_data(companies: List[Dict[str, Any]]):
                 
             # Save to file
             company_file = companies_dir / f"{company['id']}.json"
+
+            # Ensure priority is set if missing
+            if "lead_priority" not in company_dict or company_dict["lead_priority"] is None:
+                if company_dict["qualification_score"] >= 9.0:
+                    company_dict["lead_priority"] = "exceptional"
+                elif company_dict["qualification_score"] >= 8.0:
+                    company_dict["lead_priority"] = "high_priority"
+                elif company_dict["qualification_score"] >= 6.0:
+                    company_dict["lead_priority"] = "qualified"
+                else:
+                    company_dict["lead_priority"] = "low_priority"
+                    
             with open(company_file, "w") as f:
                 json.dump(company_dict, f, indent=2, cls=CustomEncoder)
                 
