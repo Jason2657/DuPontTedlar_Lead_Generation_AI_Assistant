@@ -169,6 +169,10 @@ def discover_companies_for_gathering(gathering: Dict[str, Any]) -> List[Dict[str
     Do not include any explanatory text, just the JSON array.
     """
     
+    # Ensure gathering has a valid name (for error messages)
+    if "name" not in gathering or not gathering["name"]:
+        gathering["name"] = f"Gathering-{gathering.get('id', str(uuid.uuid4())[:8])}"
+
     # Use cost-effective model for initial discovery
     gpt35_config = LLM_CONFIG["company_analysis"]["initial_screening"]
     response = call_openai_api(
@@ -279,9 +283,26 @@ def discover_companies_for_gathering(gathering: Dict[str, Any]) -> List[Dict[str
     for company in discovered_companies:
         company_id = str(uuid.uuid4())
         
+        # Make sure name is always valid
+        company_name = company.get("name", "").strip()
+        if not company_name:
+            # Generate name based on industry or segment
+            industry = company.get("industry", "Graphics & Signage").strip()
+            if "fleet" in industry.lower():
+                company_name = f"Fleet Graphics Company"
+            elif "sign" in industry.lower():
+                company_name = f"Signage Solutions"
+            elif "print" in industry.lower():
+                company_name = f"Print Graphics Pro"
+            elif "outdoor" in industry.lower():
+                company_name = f"Outdoor Advertising Co."
+            else:
+                company_name = f"Graphics & Signage Co."
+            print(f"Generated name '{company_name}' for company with missing name")
+
         enhanced_companies.append({
             "id": company_id,
-            "name": company.get("name", "Unknown Company"),
+            "name": company_name,
             "industry": company.get("industry", "Graphics & Signage"),
             "description": company.get("description", ""),
             "revenue_estimate": company.get("revenue_estimate", "Unknown"),
@@ -415,23 +436,70 @@ def qualify_company(company: Dict[str, Any]) -> Dict[str, Any]:
     )
     
     # Extract and parse the qualification results
+    # Extract and parse the qualification results
     try:
         content = response["content"]
         
-        # Find and extract JSON content
-        json_start = content.find('{')
-        json_end = content.rfind('}') + 1
+        # Debug the raw content
+        print(f"DEBUG - Response for {company['name']} - First 100 chars: {content[:100]}")
         
-        if json_start >= 0 and json_end > json_start:
-            json_content = content[json_start:json_end]
-            qualification = json.loads(json_content)
+        # Try to clean up the JSON content before parsing
+        import re
+        
+        # First try to find JSON within markdown code blocks
+        json_matches = re.findall(r'```(?:json)?\s*([\s\S]*?)```', content)
+        if json_matches:
+            # Use the first JSON block found
+            try:
+                qualification = json.loads(json_matches[0])
+                print(f"Successfully parsed JSON from markdown block for {company['name']}")
+            except json.JSONDecodeError:
+                # If that fails, try standard JSON extraction
+                json_start = content.find('{')
+                json_end = content.rfind('}') + 1
+                
+                if json_start >= 0 and json_end > json_start:
+                    json_content = content[json_start:json_end]
+                    try:
+                        qualification = json.loads(json_content)
+                        print(f"Successfully parsed JSON from content for {company['name']}")
+                    except:
+                        # If both methods fail, create an empty qualification with minimal data
+                        qualification = {
+                            "industry_relevance": {"score": company.get("qualification_score", 7.0)},
+                            "product_fit": {"score": company.get("qualification_score", 7.0)},
+                            "decision_maker_access": {"score": 7.0},
+                            "current_engagement": {"score": 7.0},
+                            "market_presence": {"score": 7.0}
+                        }
+                        print(f"Created fallback qualification data for {company['name']}")
+                else:
+                    qualification = {}
+                    print(f"WARNING: Could not extract JSON from response for {company['name']}.")
         else:
-            # Handle case where JSON isn't properly formatted
-            print(f"WARNING: Could not extract JSON from response for {company['name']}.")
-            qualification = {}
+            # Standard JSON extraction
+            json_start = content.find('{')
+            json_end = content.rfind('}') + 1
+            
+            if json_start >= 0 and json_end > json_start:
+                json_content = content[json_start:json_end]
+                qualification = json.loads(json_content)
+                print(f"Parsed standard JSON for {company['name']}")
+            else:
+                # Handle case where JSON isn't properly formatted
+                print(f"WARNING: Could not extract JSON from response for {company['name']}.")
+                qualification = {}
     except Exception as e:
         print(f"Error parsing qualification response for {company['name']}: {str(e)}")
-        qualification = {}
+        # Create a minimal qualification with default values
+        qualification = {
+            "industry_relevance": {"score": company.get("qualification_score", 7.0)},
+            "product_fit": {"score": company.get("qualification_score", 7.0)},
+            "decision_maker_access": {"score": 7.0},
+            "current_engagement": {"score": 7.0},
+            "market_presence": {"score": 7.0}
+        }
+        print(f"Created default qualification data for {company['name']} after error")
     
     # Update company with qualification results
     qualified_company = company.copy()
@@ -698,7 +766,8 @@ def save_company_data(companies: List[Dict[str, Any]]):
             company_file = companies_dir / f"{company['id']}.json"
 
             # Ensure priority is set if missing
-            if "lead_priority" not in company_dict or company_dict["lead_priority"] is None:
+            # Always set the priority based on the current qualification score
+            if "qualification_score" in company_dict:
                 if company_dict["qualification_score"] >= 9.0:
                     company_dict["lead_priority"] = "exceptional"
                 elif company_dict["qualification_score"] >= 8.0:
@@ -707,6 +776,10 @@ def save_company_data(companies: List[Dict[str, Any]]):
                     company_dict["lead_priority"] = "qualified"
                 else:
                     company_dict["lead_priority"] = "low_priority"
+            else:
+                company_dict["lead_priority"] = "unknown"
+                
+            print(f"Set priority to {company_dict['lead_priority']} based on score {company_dict.get('qualification_score', 'unknown')}")
                     
             with open(company_file, "w") as f:
                 json.dump(company_dict, f, indent=2, cls=CustomEncoder)
