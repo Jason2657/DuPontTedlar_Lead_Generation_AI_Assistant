@@ -28,11 +28,12 @@ This system uses AI to automate the lead generation process by:
 
 ## Usage
 
-1. Run event research: `python src/data_processing/event_research.py`
-2. Analyze companies: `python src/data_processing/company_analysis.py`
-3. Identify stakeholders: `python src/data_processing/stakeholder_identification.py`
-4. Generate outreach messages: `python src/outreach/message_generation.py`
+1. Run event research: `python -m src/data_processing.event_research.py`
+2. Analyze companies: `python -m src/data_processing.company_analysis.py`
+3. Identify stakeholders: `python -m src/data_processing.stakeholder_identification.py`
+4. Generate outreach messages: `python -m src/outreach.message_generation.py`
 5. Launch dashboard: `streamlit run dashboard/app.py`
+(Optionally add --limit or --debug paramteres to limit query)
 
 ## Project Structure
 
