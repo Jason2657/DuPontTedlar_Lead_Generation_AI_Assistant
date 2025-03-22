@@ -1,9 +1,13 @@
 # Instalily_GTM_Engineer_CaseStudy
-Jason Xie - jax2001@columbia.edu 
 
 ## DuPont Tedlar Lead Generation AI Assistant
 
 A prototype for an AI-powered sales lead generation and management system for DuPont Tedlar's Graphics & Signage team.
+
+Technical Stack: Python 3.x | OpenAI API | Perplexity API | Streamlit 
+| LLM Prompt Engineering | Token Optimization
+| JSON | API Integration (LinkedIn/Clay) | Modular Pipeline Architecture
+| Error Handling & Fallback Systems | Multi-tier AI Strategy
 
 ## Project Overview
 
