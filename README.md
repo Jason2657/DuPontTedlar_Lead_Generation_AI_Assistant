@@ -9,6 +9,8 @@ Technical Stack: Python 3.x | OpenAI API | Perplexity API | Streamlit
 | JSON | API Integration (LinkedIn/Clay) | Modular Pipeline Architecture
 | Error Handling & Fallback Systems | Multi-tier AI Strategy
 
+![Dashboard Screenshot](assets/dashboard_layout.png)
+
 ## Project Overview
 
 This system uses AI to automate the lead generation process by:
