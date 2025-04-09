@@ -1,6 +1,6 @@
-# Instalily_GTM_Engineer_CaseStudy
+//# Instalily_GTM_Engineer_CaseStudy
 
-## DuPont Tedlar Lead Generation AI Assistant
+# DuPont Tedlar Lead Generation AI Assistant
 
 A prototype for an AI-powered sales lead generation and management system for DuPont Tedlar's Graphics & Signage team.
 
